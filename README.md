@@ -1,6 +1,6 @@
 # Multi-Tenant Context Store
 
-A jumpstart project demonstrating how to build a GenAI context storage system for a multi-tenant environment (e.g., Odoo Copilot). It uses **FastAPI** to serve the REST API and **OpenSearch** as the vector/JSON document store.
+A jumpstart project demonstrating how to build a GenAI context storage system for a multi-tenant environment. It uses **FastAPI** to serve the REST API and **OpenSearch** as the vector/JSON document store.
 
 ## Features
 
