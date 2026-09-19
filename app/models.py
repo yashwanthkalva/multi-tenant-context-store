@@ -12,7 +12,7 @@ class ModelField(BaseModel):
     description: Optional[str] = None
     required: bool = False
 
-class OdooModel(BaseModel):
+class DatabaseModel(BaseModel):
     name: str  # e.g., 'account.move'
     description: str
     fields: List[ModelField] = []
@@ -37,7 +37,7 @@ class Example(BaseModel):
 
 class TenantContext(BaseModel):
     domains: List[Domain] = []
-    models: List[OdooModel] = []
+    models: List[DatabaseModel] = []
     routing: Optional[Routing] = None
     patterns: List[Pattern] = []
     rules: List[Rule] = []

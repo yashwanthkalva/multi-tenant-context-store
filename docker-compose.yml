@@ -27,6 +27,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis-cache
+    command: redis-server --requirepass ${REDIS_PASSWORD:-Secret_Redis99!}
     ports:
       - "6380:6379"
     volumes:

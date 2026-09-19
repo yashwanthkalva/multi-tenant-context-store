@@ -21,59 +21,59 @@ def wait_for_api():
 
 tenant1_data = {
     "domains": [
-        {"name": "finance", "description": "Financial domain operations", "attributes": {"base_currency": "USD"}}
+        {"name": "sales", "description": "Global Sales and Lead Management", "attributes": {"region": "North America"}}
     ],
     "models": [
         {
-            "name": "account.move",
-            "description": "Journal Entry / Invoice",
+            "name": "crm_leads",
+            "description": "Sales Leads and Prospects",
             "fields": [
-                {"name": "name", "type": "char", "description": "Invoice Number", "required": True},
-                {"name": "amount_total", "type": "monetary", "description": "Total Amount", "required": False}
+                {"name": "lead_name", "type": "varchar", "description": "Company or Prospect Name", "required": True},
+                {"name": "estimated_revenue", "type": "numeric", "description": "Expected Deal Size", "required": False}
             ]
         }
     ],
     "routing": {
-        "strategy": "lowest_latency",
-        "endpoints": ["https://api.openai.com/v1/chat/completions"]
+        "strategy": "high_throughput",
+        "endpoints": ["https://api.enterprise-ai.local/v1/sales-models"]
     },
     "patterns": [
-        {"name": "invoice_id", "regex": "INV-\\\\d{4}-\\\\d{4}", "description": "Standard invoice ID format"}
+        {"name": "lead_id_format", "regex": "LID-\\\\d{6}", "description": "Standard Lead ID format"}
     ],
     "rules": [
-        {"rule_id": "rule_1", "condition": "user_role == 'admin'", "action": "allow_override"}
+        {"rule_id": "rule_high_value", "condition": "estimated_revenue > 100000", "action": "route_to_enterprise_queue"}
     ],
     "examples": [
-        {"input": "What is the total revenue?", "output": "SELECT SUM(amount_total) FROM account_move WHERE state = 'posted';"}
+        {"input": "Show me all high value leads", "output": "SELECT * FROM crm_leads WHERE estimated_revenue > 100000;"}
     ]
 }
 
 tenant2_data = {
     "domains": [
-        {"name": "hr", "description": "Human resources domain", "attributes": {"language": "EN"}}
+        {"name": "customer_support", "description": "Post-sales Support and Ticketing", "attributes": {"region": "Europe"}}
     ],
     "models": [
         {
-            "name": "hr.employee",
-            "description": "Employee Record",
+            "name": "crm_tickets",
+            "description": "Customer Support Tickets",
             "fields": [
-                {"name": "name", "type": "char", "description": "Employee Name", "required": True},
-                {"name": "department_id", "type": "many2one", "description": "Department", "required": False}
+                {"name": "ticket_subject", "type": "varchar", "description": "Issue Summary", "required": True},
+                {"name": "priority", "type": "integer", "description": "Severity Level 1-5", "required": True}
             ]
         }
     ],
     "routing": {
-        "strategy": "cost_optimized",
-        "endpoints": ["https://api.anthropic.com/v1/messages"]
+        "strategy": "lowest_latency",
+        "endpoints": ["https://api.enterprise-ai.local/v2/support-models"]
     },
     "patterns": [
-        {"name": "employee_id", "regex": "EMP\\\\d{5}", "description": "Standard employee ID format"}
+        {"name": "ticket_id_format", "regex": "TKT-\\\\d{4}-\\\\w{3}", "description": "Standard Ticket ID format"}
     ],
     "rules": [
-        {"rule_id": "rule_a", "condition": "query_contains('salary')", "action": "require_manager_role"}
+        {"rule_id": "rule_escalation", "condition": "priority == 1", "action": "notify_support_manager"}
     ],
     "examples": [
-        {"input": "Who is John Doe's manager?", "output": "SELECT parent_id FROM hr_employee WHERE name = 'John Doe';"}
+        {"input": "Find urgent open tickets", "output": "SELECT ticket_subject FROM crm_tickets WHERE priority = 1 AND status = 'Open';"}
     ]
 }
 
@@ -81,11 +81,11 @@ def seed_data():
     if not wait_for_api():
         return
 
-    print("\\n--- Seeding Tenant 1 ---")
+    print("\\n--- Seeding Tenant 1 (AcmeCorp CRM) ---")
     res1 = requests.post(f"{API_URL}/tenant/tenant-001/context", json=tenant1_data)
     print("Tenant 1 Post Response:", res1.json())
 
-    print("\\n--- Seeding Tenant 2 ---")
+    print("\\n--- Seeding Tenant 2 (Globex CRM) ---")
     res2 = requests.post(f"{API_URL}/tenant/tenant-002/context", json=tenant2_data)
     print("Tenant 2 Post Response:", res2.json())
     
